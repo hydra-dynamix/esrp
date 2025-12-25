@@ -16,7 +16,11 @@
       "Bash(dev git branch-create:*)",
       "Bash(dev ci)",
       "Bash(Remove-Item -Path nul -Force -ErrorAction SilentlyContinue)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(cargo build:*)",
+      "Bash(cargo check:*)",
+      "Bash(gh issue create:*)",
+      "Bash(dev git branch-finalize)"
     ]
   }
 }

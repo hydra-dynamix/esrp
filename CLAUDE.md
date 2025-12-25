@@ -58,3 +58,18 @@ Example: `feat: implement canonical JSON serialization for ESRP requests`
 ## Project Structure
 
 See `docs/tickets/000-index.md` for the full implementation plan organized into phases.
+
+## Current Work
+
+**Active Ticket:** [001 - Create Cargo Workspace](docs/tickets/001-create-cargo-workspace.md)
+**Branch:** `feature/001-create-cargo-workspace`
+**Status:** In Progress
+
+### Tasks:
+- [x] Create feature branch
+- [x] Create workspace root Cargo.toml
+- [x] Create crate directories
+- [x] Create supporting directories (bindings, fixtures, tests)
+- [x] Verify workspace compiles
+- [ ] Run CI and finalize branch
+- [ ] Create GitHub issue

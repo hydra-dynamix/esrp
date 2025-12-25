@@ -1,0 +1,13 @@
+[package]
+name = "esrp-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Command-line tool for the Erasmus Service Request Protocol"
+
+[[bin]]
+name = "esrp"
+path = "src/main.rs"
+
+[dependencies]
