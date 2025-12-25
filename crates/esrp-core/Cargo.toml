@@ -5,5 +5,19 @@ edition.workspace = true
 license.workspace = true
 repository.workspace = true
 description = "Core types and validation for the Erasmus Service Request Protocol"
+keywords = ["esrp", "protocol", "ai", "orchestration"]
+categories = ["data-structures", "encoding"]
 
 [dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+uuid = { workspace = true }
+chrono = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+pretty_assertions = "1.4"
+
+# Ignore unused deps until types are implemented (Ticket 102)
+[package.metadata.cargo-udeps.ignore]
+normal = ["chrono", "serde", "uuid"]
