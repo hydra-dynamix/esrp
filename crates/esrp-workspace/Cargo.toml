@@ -1,0 +1,9 @@
+[package]
+name = "esrp-workspace"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Workspace URI handling for the Erasmus Service Request Protocol"
+
+[dependencies]

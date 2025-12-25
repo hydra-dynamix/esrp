@@ -1,0 +1,9 @@
+[package]
+name = "esrp-canonical"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Deterministic JSON serialization for the Erasmus Service Request Protocol"
+
+[dependencies]

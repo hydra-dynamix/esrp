@@ -45,7 +45,7 @@ Phase 1 (Core Types)
 ## All Tickets
 
 ### Phase 0: Repository Setup
-- [ ] [001 - Create Cargo Workspace](001-create-cargo-workspace.md)
+- [~] [001 - Create Cargo Workspace](001-create-cargo-workspace.md)
 - [ ] [002 - Initialize Git Repository](002-initialize-git-repository.md)
 
 ### Phase 1: Core Protocol Types

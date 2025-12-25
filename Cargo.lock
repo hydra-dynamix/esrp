@@ -3,5 +3,21 @@
 version = 4
 
 [[package]]
-name = "esrp"
+name = "esrp-canonical"
+version = "0.1.0"
+
+[[package]]
+name = "esrp-cli"
+version = "0.1.0"
+
+[[package]]
+name = "esrp-core"
+version = "0.1.0"
+
+[[package]]
+name = "esrp-http"
+version = "0.1.0"
+
+[[package]]
+name = "esrp-workspace"
 version = "0.1.0"
