@@ -1,0 +1,25 @@
+{
+  "esrp_version": "1.0",
+  "request_id": "550e8400-e29b-41d4-a716-446655440000",
+  "status": "failed",
+  "timing": {
+    "started_at": "2025-01-01T00:00:00Z",
+    "finished_at": "2025-01-01T00:00:05.000Z",
+    "duration_ms": 5000
+  },
+  "outputs": [],
+  "artifacts": [],
+  "error": {
+    "code": "BACKEND_UNAVAILABLE",
+    "message": "Text-to-speech service is temporarily unavailable",
+    "retryable": true,
+    "retry_after_ms": 5000,
+    "retry_strategy": "exponential",
+    "max_retries": 3,
+    "details": {
+      "backend_url": "http://localhost:7097",
+      "http_status": 502,
+      "last_successful": "2025-01-01T00:00:00Z"
+    }
+  }
+}

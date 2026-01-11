@@ -1,0 +1,33 @@
+{
+  "esrp_version": "1.0",
+  "request_id": "550e8400-e29b-41d4-a716-446655440000",
+  "status": "succeeded",
+  "timing": {
+    "accepted_at": "2025-01-01T00:00:00Z",
+    "started_at": "2025-01-01T00:00:00.100Z",
+    "finished_at": "2025-01-01T00:00:01.234Z",
+    "duration_ms": 1134
+  },
+  "outputs": [
+    {
+      "name": "audio",
+      "content_type": "audio/wav",
+      "data": "workspace://artifacts/audio_550e8400.wav",
+      "encoding": "path",
+      "metadata": {
+        "sample_rate": 44100,
+        "channels": 1
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "990e8400-e29b-41d4-a716-446655440000",
+      "kind": "file",
+      "uri": "workspace://artifacts/audio_550e8400.wav",
+      "sha256": "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456",
+      "size_bytes": 123456,
+      "retention": "run"
+    }
+  ]
+}

@@ -6,6 +6,7 @@ members = [
     "crates/esrp-workspace",
     "crates/esrp-http",
     "tools/esrp-cli",
+    "tools/generate-fixtures",
 ]
 
 [workspace.package]

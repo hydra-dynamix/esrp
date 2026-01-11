@@ -71,11 +71,11 @@ Phase 1 (Core Types)
 - [x] [305 - Write Workspace Tests](305-write-workspace-tests.md)
 
 ### Phase 4: Test Fixtures
-- [ ] [401 - Create Fixture Directory Structure](401-create-fixture-structure.md)
-- [ ] [402 - Create Request Fixtures](402-create-request-fixtures.md)
-- [ ] [403 - Generate Canonical Fixtures](403-generate-canonical-fixtures.md)
-- [ ] [404 - Create Response Fixtures](404-create-response-fixtures.md)
-- [ ] [405 - Document Fixture Format](405-document-fixture-format.md)
+- [x] [401 - Create Fixture Directory Structure](401-create-fixture-structure.md)
+- [x] [402 - Create Request Fixtures](402-create-request-fixtures.md)
+- [x] [403 - Generate Canonical Fixtures](403-generate-canonical-fixtures.md)
+- [x] [404 - Create Response Fixtures](404-create-response-fixtures.md)
+- [x] [405 - Document Fixture Format](405-document-fixture-format.md)
 
 ### Phase 5: Conformance Tests
 - [ ] [501 - Create Conformance Test Suite](501-create-conformance-test-suite.md)
