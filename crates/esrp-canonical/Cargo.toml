@@ -4,6 +4,17 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Deterministic JSON serialization for the Erasmus Service Request Protocol"
+description = "Canonical JSON serialization for ESRP"
+keywords = ["esrp", "canonical", "json", "hashing"]
+categories = ["encoding", "cryptography"]
 
 [dependencies]
+esrp-core = { path = "../esrp-core" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+hex = "0.4"
+pretty_assertions = "1.4"
