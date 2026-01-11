@@ -50,7 +50,8 @@ fn test_canonical_json_matches_golden() {
             .unwrap_or_else(|e| panic!("Missing golden file: {}: {}", golden_path, e));
 
         assert_eq!(
-            canonical, golden,
+            canonical,
+            golden,
             "Canonical JSON mismatch for {}\nGot: {}\nExpected: {}",
             name,
             String::from_utf8_lossy(&canonical),
