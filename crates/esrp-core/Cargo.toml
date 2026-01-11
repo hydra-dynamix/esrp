@@ -17,7 +17,3 @@ thiserror = { workspace = true }
 
 [dev-dependencies]
 pretty_assertions = "1.4"
-
-# Ignore unused deps until types are implemented (Ticket 102)
-[package.metadata.cargo-udeps.ignore]
-normal = ["chrono", "serde", "uuid"]

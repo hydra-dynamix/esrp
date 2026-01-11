@@ -26,6 +26,6 @@ pub mod version;
 
 // Re-exports for convenience
 pub use error::*;
-// pub use types::*; // TODO: Uncomment when types are implemented (Ticket 102)
+pub use types::*;
 pub use validation::*;
 pub use version::*;
