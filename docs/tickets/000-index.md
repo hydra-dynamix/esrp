@@ -64,11 +64,11 @@ Phase 1 (Core Types)
 - [x] [206 - Write Canonical Tests](206-write-canonical-tests.md)
 
 ### Phase 3: Workspace Semantics
-- [ ] [301 - Create esrp-workspace Crate](301-create-esrp-workspace-crate.md)
-- [ ] [302 - Implement URI Parser](302-implement-uri-parser.md)
-- [ ] [303 - Define WorkspaceProvider Trait](303-define-workspace-provider-trait.md)
-- [ ] [304 - Implement FilesystemWorkspace](304-implement-filesystem-workspace.md)
-- [ ] [305 - Write Workspace Tests](305-write-workspace-tests.md)
+- [x] [301 - Create esrp-workspace Crate](301-create-esrp-workspace-crate.md)
+- [x] [302 - Implement URI Parser](302-implement-uri-parser.md)
+- [x] [303 - Define WorkspaceProvider Trait](303-define-workspace-provider-trait.md)
+- [x] [304 - Implement FilesystemWorkspace](304-implement-filesystem-workspace.md)
+- [x] [305 - Write Workspace Tests](305-write-workspace-tests.md)
 
 ### Phase 4: Test Fixtures
 - [ ] [401 - Create Fixture Directory Structure](401-create-fixture-structure.md)
