@@ -45,15 +45,15 @@ Phase 1 (Core Types)
 ## All Tickets
 
 ### Phase 0: Repository Setup
-- [~] [001 - Create Cargo Workspace](001-create-cargo-workspace.md)
+- [x] [001 - Create Cargo Workspace](001-create-cargo-workspace.md)
 - [ ] [002 - Initialize Git Repository](002-initialize-git-repository.md)
 
 ### Phase 1: Core Protocol Types
-- [ ] [101 - Create esrp-core Crate](101-create-esrp-core-crate.md)
-- [ ] [102 - Implement Core Types](102-implement-core-types.md)
-- [ ] [103 - Implement Version Validation](103-implement-version-validation.md)
-- [ ] [104 - Implement Input Validation](104-implement-input-validation.md)
-- [ ] [105 - Write Core Unit Tests](105-write-core-unit-tests.md)
+- [x] [101 - Create esrp-core Crate](101-create-esrp-core-crate.md)
+- [x] [102 - Implement Core Types](102-implement-core-types.md)
+- [x] [103 - Implement Version Validation](103-implement-version-validation.md)
+- [x] [104 - Implement Input Validation](104-implement-input-validation.md)
+- [x] [105 - Write Core Unit Tests](105-write-core-unit-tests.md)
 
 ### Phase 2: Canonical Representation
 - [ ] [201 - Create esrp-canonical Crate](201-create-esrp-canonical-crate.md)
