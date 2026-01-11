@@ -154,7 +154,10 @@ mod request_validation {
         let mut request = minimal_request();
         request.esrp_version = "2.0".to_string();
         let result = validate_request(&request);
-        assert!(matches!(result, Err(ValidationError::VersionMismatch { .. })));
+        assert!(matches!(
+            result,
+            Err(ValidationError::VersionMismatch { .. })
+        ));
     }
 
     #[test]
@@ -403,7 +406,10 @@ mod workspace_uri_validation {
         request.inputs[0].encoding = Encoding::Path;
         request.inputs[0].data = "workspace://temp/../etc/passwd".to_string();
         let result = validate_request(&request);
-        assert!(matches!(result, Err(ValidationError::InvalidWorkspaceUri(_))));
+        assert!(matches!(
+            result,
+            Err(ValidationError::InvalidWorkspaceUri(_))
+        ));
     }
 
     #[test]
@@ -412,7 +418,10 @@ mod workspace_uri_validation {
         request.inputs[0].encoding = Encoding::Path;
         request.inputs[0].data = "workspace:///etc/passwd".to_string();
         let result = validate_request(&request);
-        assert!(matches!(result, Err(ValidationError::InvalidWorkspaceUri(_))));
+        assert!(matches!(
+            result,
+            Err(ValidationError::InvalidWorkspaceUri(_))
+        ));
     }
 
     #[test]
@@ -421,7 +430,10 @@ mod workspace_uri_validation {
         request.inputs[0].encoding = Encoding::Path;
         request.inputs[0].data = "workspace://".to_string();
         let result = validate_request(&request);
-        assert!(matches!(result, Err(ValidationError::InvalidWorkspaceUri(_))));
+        assert!(matches!(
+            result,
+            Err(ValidationError::InvalidWorkspaceUri(_))
+        ));
     }
 }
 

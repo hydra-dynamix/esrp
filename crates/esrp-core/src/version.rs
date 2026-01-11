@@ -172,10 +172,7 @@ mod tests {
 
     #[test]
     fn test_parse_invalid_versions() {
-        assert!(matches!(
-            ESRPVersion::parse(""),
-            Err(VersionError::Empty)
-        ));
+        assert!(matches!(ESRPVersion::parse(""), Err(VersionError::Empty)));
         assert!(matches!(
             ESRPVersion::parse("1"),
             Err(VersionError::InvalidFormat(_))

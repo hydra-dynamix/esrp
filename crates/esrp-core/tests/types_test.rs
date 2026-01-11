@@ -319,18 +319,12 @@ mod json_parsing {
 
     #[test]
     fn test_encoding_serialization() {
-        assert_eq!(
-            serde_json::to_string(&Encoding::Utf8).unwrap(),
-            "\"utf-8\""
-        );
+        assert_eq!(serde_json::to_string(&Encoding::Utf8).unwrap(), "\"utf-8\"");
         assert_eq!(
             serde_json::to_string(&Encoding::Base64).unwrap(),
             "\"base64\""
         );
-        assert_eq!(
-            serde_json::to_string(&Encoding::Path).unwrap(),
-            "\"path\""
-        );
+        assert_eq!(serde_json::to_string(&Encoding::Path).unwrap(), "\"path\"");
     }
 
     #[test]

@@ -238,9 +238,8 @@ fn validate_workspace_uri(uri: &str) -> Result<(), ValidationError> {
 /// Validate artifact URI
 fn validate_artifact_uri(uri: &str) -> Result<(), ValidationError> {
     if uri.starts_with("workspace://") {
-        validate_workspace_uri(uri).map_err(|e| {
-            ValidationError::InvalidArtifactUri(uri.to_string(), e.to_string())
-        })
+        validate_workspace_uri(uri)
+            .map_err(|e| ValidationError::InvalidArtifactUri(uri.to_string(), e.to_string()))
     } else {
         // Allow other URI schemes (http, file, etc.)
         Ok(())
