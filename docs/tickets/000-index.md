@@ -56,12 +56,12 @@ Phase 1 (Core Types)
 - [x] [105 - Write Core Unit Tests](105-write-core-unit-tests.md)
 
 ### Phase 2: Canonical Representation
-- [ ] [201 - Create esrp-canonical Crate](201-create-esrp-canonical-crate.md)
-- [ ] [202 - Implement Canonical JSON Serialization](202-implement-canonical-json.md)
-- [ ] [203 - Implement SHA256 Hashing](203-implement-hashing.md)
-- [ ] [204 - Implement Payload Hash Derivation](204-implement-payload-hash.md)
-- [ ] [205 - Document Number Handling](205-document-number-handling.md)
-- [ ] [206 - Write Canonical Tests](206-write-canonical-tests.md)
+- [x] [201 - Create esrp-canonical Crate](201-create-esrp-canonical-crate.md)
+- [x] [202 - Implement Canonical JSON Serialization](202-implement-canonical-json.md)
+- [x] [203 - Implement SHA256 Hashing](203-implement-hashing.md)
+- [x] [204 - Implement Payload Hash Derivation](204-implement-payload-hash.md)
+- [x] [205 - Document Number Handling](205-document-number-handling.md)
+- [x] [206 - Write Canonical Tests](206-write-canonical-tests.md)
 
 ### Phase 3: Workspace Semantics
 - [ ] [301 - Create esrp-workspace Crate](301-create-esrp-workspace-crate.md)
