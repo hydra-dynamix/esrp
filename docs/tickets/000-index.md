@@ -78,8 +78,8 @@ Phase 1 (Core Types)
 - [x] [405 - Document Fixture Format](405-document-fixture-format.md)
 
 ### Phase 5: Conformance Tests
-- [ ] [501 - Create Conformance Test Suite](501-create-conformance-test-suite.md)
-- [ ] [502 - Add CI Pipeline](502-add-ci-pipeline.md)
+- [x] [501 - Create Conformance Test Suite](501-create-conformance-test-suite.md)
+- [x] [502 - Add CI Pipeline](502-add-ci-pipeline.md)
 
 ### Phase 6: HTTP Transport
 - [ ] [601 - Create esrp-http Crate](601-create-esrp-http-crate.md)
