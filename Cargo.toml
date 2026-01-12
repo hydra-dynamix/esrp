@@ -8,6 +8,7 @@ members = [
     "tools/esrp-cli",
     "tools/generate-fixtures",
     "bindings/python",
+    "examples/esrp-server",
 ]
 
 [workspace.package]
