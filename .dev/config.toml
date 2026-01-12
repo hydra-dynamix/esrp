@@ -55,9 +55,9 @@ commands = [
 
 [tasks.rust_ci_extras]
 # Security, license, and dep hygiene. Safe for CI, no file writes.
+# Note: cargo audit removed due to CVSS 4.0 parsing issue in advisory-db
 commands = [
-  ["cargo", "audit"],
-  ["cargo", "check"],
+  ["cargo", "deny", "check"],
   ["cargo", "+nightly", "udeps"]
 ]
 
@@ -256,10 +256,9 @@ commands = ["rust_ci", "py_ci", "ts_ci"]
 # ===================== Git ========================
 
 [git]
-# Optional overrides
-# main_branch = "main"
-# release_branch = "release-candidate"
-# allowed_branch_tags = ["feat", "fix", "docs", "chore", "refactor", "perf", "test", "build", "ci"]
+main_branch = "main"
+release_branch = "release-candidate"
+allowed_branch_tags = ["feat", "fix", "docs", "chore", "refactor", "perf", "test", "build", "ci"]
 
 # ===================== Environment ========================
 # Define required and optional environment variables for validation.
