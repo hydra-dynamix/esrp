@@ -10,6 +10,9 @@
 //!   # Proxy to real Erasmus services
 //!   ERASMUS_URL=http://localhost:8000 cargo run --package esrp-server
 
+// Allow large error types - ESRPResponse is used as both success and error
+#![allow(clippy::result_large_err)]
+
 mod handlers;
 mod legacy_bridge;
 

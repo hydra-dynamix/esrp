@@ -4,9 +4,7 @@
 //! and converts responses back to ESRP format.
 
 use chrono::Utc;
-use esrp_core::{
-    ESRPRequest, ESRPResponse, Encoding, Error, ErrorCode, Output, Status, Timing,
-};
+use esrp_core::{ESRPRequest, ESRPResponse, Encoding, Error, ErrorCode, Output, Status, Timing};
 use serde::{Deserialize, Serialize};
 
 /// Legacy Erasmus request format
@@ -178,18 +176,20 @@ impl LegacyBridge {
         let result = client
             .post(url)
             .json(legacy_req)
-            .timeout(std::time::Duration::from_millis(
-                request.mode.timeout_ms,
-            ))
+            .timeout(std::time::Duration::from_millis(request.mode.timeout_ms))
             .send()
             .await;
 
         match result {
             Ok(resp) => {
                 if resp.status().is_success() {
-                    resp.json::<LegacyResponse>()
-                        .await
-                        .map_err(|e| Self::error_response(request, &format!("Failed to parse response: {}", e), started_at))
+                    resp.json::<LegacyResponse>().await.map_err(|e| {
+                        Self::error_response(
+                            request,
+                            &format!("Failed to parse response: {}", e),
+                            started_at,
+                        )
+                    })
                 } else {
                     let status = resp.status();
                     let body = resp.text().await.unwrap_or_default();
@@ -204,7 +204,11 @@ impl LegacyBridge {
                 if e.is_timeout() {
                     Err(Self::timeout_response(request, started_at))
                 } else if e.is_connect() {
-                    Err(Self::unavailable_response(request, &e.to_string(), started_at))
+                    Err(Self::unavailable_response(
+                        request,
+                        &e.to_string(),
+                        started_at,
+                    ))
                 } else {
                     Err(Self::error_response(request, &e.to_string(), started_at))
                 }
@@ -240,9 +244,9 @@ impl LegacyBridge {
                 accepted_at: Some(started_at),
                 started_at: Some(started_at),
                 finished_at: Some(finished_at),
-                duration_ms: legacy.duration_ms.or(Some(
-                    (finished_at - started_at).num_milliseconds() as f64,
-                )),
+                duration_ms: legacy
+                    .duration_ms
+                    .or(Some((finished_at - started_at).num_milliseconds() as f64)),
             }),
             outputs: vec![Output {
                 name: output_name.to_string(),
@@ -296,9 +300,9 @@ impl LegacyBridge {
                 accepted_at: Some(started_at),
                 started_at: Some(started_at),
                 finished_at: Some(finished_at),
-                duration_ms: legacy.duration_ms.or(Some(
-                    (finished_at - started_at).num_milliseconds() as f64,
-                )),
+                duration_ms: legacy
+                    .duration_ms
+                    .or(Some((finished_at - started_at).num_milliseconds() as f64)),
             }),
             outputs: vec![Output {
                 name: output_name.to_string(),
@@ -344,10 +348,7 @@ impl LegacyBridge {
         }
     }
 
-    fn timeout_response(
-        request: &ESRPRequest,
-        started_at: chrono::DateTime<Utc>,
-    ) -> ESRPResponse {
+    fn timeout_response(request: &ESRPRequest, started_at: chrono::DateTime<Utc>) -> ESRPResponse {
         let finished_at = Utc::now();
         ESRPResponse {
             esrp_version: request.esrp_version.clone(),

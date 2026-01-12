@@ -4,9 +4,7 @@ use crate::legacy_bridge::LegacyBridge;
 use axum::http::StatusCode;
 use axum::Json;
 use chrono::Utc;
-use esrp_core::{
-    ESRPRequest, ESRPResponse, Encoding, Error, ErrorCode, Output, Status, Timing,
-};
+use esrp_core::{ESRPRequest, ESRPResponse, Encoding, Error, ErrorCode, Output, Status, Timing};
 use esrp_http::{ESRPRequestExtractor, ESRPResponseJson};
 use serde::Serialize;
 
@@ -71,9 +69,7 @@ pub async fn execute(
                 accepted_at: Some(started_at),
                 started_at: Some(started_at),
                 finished_at: Some(finished_at),
-                duration_ms: Some(
-                    (finished_at - started_at).num_milliseconds() as f64,
-                ),
+                duration_ms: Some((finished_at - started_at).num_milliseconds() as f64),
             });
             Ok(ESRPResponseJson(response))
         }
@@ -220,7 +216,8 @@ async fn handle_tts(request: &ESRPRequest) -> Result<ESRPResponse, ESRPResponse>
         wav
     };
 
-    let audio_base64 = base64::Engine::encode(&base64::engine::general_purpose::STANDARD, &fake_wav);
+    let audio_base64 =
+        base64::Engine::encode(&base64::engine::general_purpose::STANDARD, &fake_wav);
 
     Ok(ESRPResponse {
         esrp_version: request.esrp_version.clone(),
@@ -331,15 +328,16 @@ fn get_input_text(request: &ESRPRequest, name: &str) -> Result<String, ESRPRespo
     match input.encoding {
         Encoding::Utf8 => Ok(input.data.clone()),
         Encoding::Base64 => {
-            let bytes = base64::Engine::decode(&base64::engine::general_purpose::STANDARD, &input.data)
-                .map_err(|e| {
-                    create_error_response(
-                        request,
-                        ErrorCode::InvalidInputSchema,
-                        format!("Invalid base64 in input '{}': {}", name, e),
-                        Utc::now(),
-                    )
-                })?;
+            let bytes =
+                base64::Engine::decode(&base64::engine::general_purpose::STANDARD, &input.data)
+                    .map_err(|e| {
+                        create_error_response(
+                            request,
+                            ErrorCode::InvalidInputSchema,
+                            format!("Invalid base64 in input '{}': {}", name, e),
+                            Utc::now(),
+                        )
+                    })?;
             String::from_utf8(bytes).map_err(|e| {
                 create_error_response(
                     request,
