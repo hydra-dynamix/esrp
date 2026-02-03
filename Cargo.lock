@@ -429,7 +429,6 @@ dependencies = [
  "async-trait",
  "axum",
  "chrono",
- "esrp-canonical",
  "esrp-core",
  "reqwest",
  "serde",
@@ -437,7 +436,6 @@ dependencies = [
  "thiserror",
  "tokio",
  "tokio-test",
- "tower-http 0.5.2",
  "uuid",
 ]
 
@@ -461,7 +459,6 @@ dependencies = [
  "axum",
  "base64",
  "chrono",
- "esrp-canonical",
  "esrp-core",
  "esrp-http",
  "reqwest",

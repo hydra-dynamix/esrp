@@ -11,7 +11,6 @@ path = "src/main.rs"
 [dependencies]
 esrp-core = { path = "../../crates/esrp-core" }
 esrp-http = { path = "../../crates/esrp-http" }
-esrp-canonical = { path = "../../crates/esrp-canonical" }
 
 axum = "0.7"
 tokio = { version = "1.0", features = ["full"] }
