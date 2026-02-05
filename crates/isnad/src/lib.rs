@@ -14,26 +14,37 @@
 //!
 //! # Example
 //!
-//! ```ignore
-//! use isnad::{Attestation, AttestationType, Subject, Attestor, Evidence};
+//! ```
+//! use isnad::{Attestation, AttestationType, Subject, Attestor, Evidence, KeyPair};
+//!
+//! // Generate a keypair for signing
+//! let keypair = KeyPair::generate();
 //!
 //! let attestor = Attestor {
-//!     agent_id: "123".to_string(),
+//!     agent_id: keypair.public_key_id(),
 //!     agent_name: "Rufio".to_string(),
 //!     platform: Some("moltbook".to_string()),
 //! };
 //!
-//! let attestation = Attestation::new(
+//! let mut attestation = Attestation::new(
 //!     attestor,
 //!     AttestationType::SecurityAudit,
 //!     Subject::skill("weather-skill", "sha256:abc123..."),
 //! )
 //! .with_claim("no_network_exfiltration", true)
 //! .with_evidence(Evidence::new("yara_scan").with_notes("No malicious patterns"));
+//!
+//! // Sign the attestation
+//! attestation.sign(&keypair).expect("signing failed");
+//!
+//! // Verify later
+//! assert!(attestation.verify(&keypair.public_key()).is_ok());
 //! ```
 
-mod types;
 mod error;
+mod signing;
+mod types;
 
-pub use types::*;
 pub use error::*;
+pub use signing::*;
+pub use types::*;
