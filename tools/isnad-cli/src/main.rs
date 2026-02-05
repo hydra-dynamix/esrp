@@ -1,19 +1,14 @@
 //! Isnad CLI - Agent trust attestation tool.
 //!
-//! # Commands
-//!
-//! - `isnad keygen` - Generate a new Ed25519 keypair
-//! - `isnad hash <file>` - Compute SHA256 hash of a file
-//! - `isnad attest` - Create a signed attestation
-//! - `isnad verify <file>` - Verify an attestation signature
-//! - `isnad trust <hash>` - Check trust status for a subject
+//! Run `isnad` for command list, `isnad <cmd> --help` for details.
 
 use anyhow::{anyhow, Context, Result};
 use clap::{Parser, Subcommand};
 use isnad::{
     Attestation, AttestationType, Attestor, ChainConfig, ChainValidator, Evidence, KeyPair,
-    MemoryStore, PublicKey, Subject, SubjectType, TrustAnchor,
+    MemoryStore, PublicKey, ReputationCalculator, Subject, SubjectType, TrustAnchor,
 };
+use serde::Serialize;
 use sha2::{Digest, Sha256};
 use std::fs;
 use std::io::{self, Read};
@@ -21,122 +16,166 @@ use std::path::PathBuf;
 
 #[derive(Parser)]
 #[command(name = "isnad")]
-#[command(about = "Agent trust attestation tool", long_about = None)]
-#[command(version)]
+#[command(about = "Agent trust attestations. Use --help on subcommands for details.")]
+#[command(version, propagate_version = true)]
 struct Cli {
+    /// Output JSON (machine-readable)
+    #[arg(long, global = true)]
+    json: bool,
+
     #[command(subcommand)]
     command: Commands,
 }
 
 #[derive(Subcommand)]
 enum Commands {
-    /// Generate a new Ed25519 keypair
+    /// Generate Ed25519 keypair
+    #[command(visible_alias = "kg")]
     Keygen {
-        /// Output file for secret key (default: stdout)
+        /// Secret key output file
         #[arg(short, long)]
         output: Option<PathBuf>,
-
-        /// Also output public key to this file
+        /// Public key output file
         #[arg(short, long)]
         public: Option<PathBuf>,
     },
 
-    /// Compute SHA256 hash of a file (for use as content_hash)
+    /// SHA256 hash a file
     Hash {
-        /// File to hash (use - for stdin)
+        /// File (- for stdin)
         file: PathBuf,
     },
 
-    /// Create a signed attestation
+    /// Create signed attestation
+    #[command(visible_alias = "att")]
     Attest {
-        /// Subject content hash (use `isnad hash` to compute)
+        /// Subject content hash
         #[arg(long)]
         subject_hash: String,
-
         /// Subject name
         #[arg(long)]
         subject_name: String,
-
-        /// Subject type: skill, agent, artifact, data
+        /// Type: skill|agent|artifact|data
         #[arg(long, default_value = "skill")]
         subject_type: String,
-
-        /// Attestation type: security_audit, code_review, functional_test, vouch
+        /// Type: audit|review|test|vouch|revoke
         #[arg(long, short = 't', default_value = "vouch")]
         attestation_type: String,
-
         /// Your agent ID
         #[arg(long)]
         agent_id: String,
-
         /// Your agent name
         #[arg(long)]
         agent_name: String,
-
-        /// Platform (e.g., moltbook)
+        /// Platform (e.g. moltbook)
         #[arg(long)]
         platform: Option<String>,
-
-        /// Secret key file (or - for stdin)
+        /// Secret key file
         #[arg(long, short = 'k')]
         key: PathBuf,
-
-        /// Add a claim (can be repeated): --claim "no_network_exfiltration=true"
+        /// Claim: key=true|false (repeatable)
         #[arg(long, short = 'c')]
         claim: Vec<String>,
-
-        /// Evidence method (e.g., "yara_scan", "manual_review")
+        /// Evidence method
         #[arg(long)]
         evidence_method: Option<String>,
-
         /// Evidence notes
         #[arg(long)]
         evidence_notes: Option<String>,
-
-        /// Output file (default: stdout)
+        /// Output file
         #[arg(short, long)]
         output: Option<PathBuf>,
     },
 
-    /// Verify an attestation signature
+    /// Verify attestation signature
+    #[command(visible_alias = "v")]
     Verify {
         /// Attestation JSON file
         file: PathBuf,
-
-        /// Public key file (if not provided, just checks structure)
+        /// Public key file
         #[arg(long, short = 'k')]
         public_key: Option<PathBuf>,
     },
 
-    /// Check trust status for a subject
+    /// Check trust for subject hash
+    #[command(visible_alias = "t")]
     Trust {
         /// Subject content hash
         hash: String,
-
-        /// Attestation store file (JSON array of attestations)
+        /// Attestation store JSON
         #[arg(long, short = 's')]
         store: PathBuf,
-
-        /// Trust anchor agent IDs (can be repeated)
+        /// Trust anchor agent ID (repeatable)
         #[arg(long, short = 'a')]
         anchor: Vec<String>,
-
-        /// Minimum attestations required
+        /// Minimum attestations
         #[arg(long, default_value = "1")]
         min: usize,
-
-        /// Require security_audit type
+        /// Require security_audit
         #[arg(long)]
         require_audit: bool,
     },
+
+    /// Compute reputation score
+    #[command(visible_alias = "rep")]
+    Reputation {
+        /// Subject content hash
+        hash: String,
+        /// Attestation store JSON
+        #[arg(long, short = 's')]
+        store: PathBuf,
+        /// Trust anchor agent ID (repeatable)
+        #[arg(long, short = 'a')]
+        anchor: Vec<String>,
+    },
+}
+
+// JSON output types
+#[derive(Serialize)]
+struct KeygenOutput {
+    secret_key: String,
+    public_key: String,
+    key_id: String,
+}
+
+#[derive(Serialize)]
+struct HashOutput {
+    hash: String,
+}
+
+#[derive(Serialize)]
+struct VerifyOutput {
+    valid: bool,
+    attestation_id: String,
+    attestation_type: String,
+    attestor: String,
+    subject: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    error: Option<String>,
+}
+
+#[derive(Serialize)]
+struct TrustOutput {
+    trusted: bool,
+    attestation_count: usize,
+    chain_depth: usize,
+    warnings: Vec<String>,
+}
+
+#[derive(Serialize)]
+struct ReputationOutput {
+    score: f64,
+    attestation_count: usize,
+    avg_age_days: f64,
+    warnings: Vec<String>,
 }
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Keygen { output, public } => cmd_keygen(output, public),
-        Commands::Hash { file } => cmd_hash(file),
+        Commands::Keygen { output, public } => cmd_keygen(cli.json, output, public),
+        Commands::Hash { file } => cmd_hash(cli.json, file),
         Commands::Attest {
             subject_hash,
             subject_name,
@@ -151,6 +190,7 @@ fn main() -> Result<()> {
             evidence_notes,
             output,
         } => cmd_attest(
+            cli.json,
             subject_hash,
             subject_name,
             subject_type,
@@ -164,58 +204,77 @@ fn main() -> Result<()> {
             evidence_notes,
             output,
         ),
-        Commands::Verify { file, public_key } => cmd_verify(file, public_key),
+        Commands::Verify { file, public_key } => cmd_verify(cli.json, file, public_key),
         Commands::Trust {
             hash,
             store,
             anchor,
             min,
             require_audit,
-        } => cmd_trust(hash, store, anchor, min, require_audit),
+        } => cmd_trust(cli.json, hash, store, anchor, min, require_audit),
+        Commands::Reputation {
+            hash,
+            store,
+            anchor,
+        } => cmd_reputation(cli.json, hash, store, anchor),
     }
 }
 
-fn cmd_keygen(output: Option<PathBuf>, public: Option<PathBuf>) -> Result<()> {
+fn cmd_keygen(json: bool, output: Option<PathBuf>, public: Option<PathBuf>) -> Result<()> {
     let keypair = KeyPair::generate();
     let secret = keypair.secret_key_base64();
     let pubkey = keypair.public_key().to_base64();
+    let key_id = keypair.public_key_id();
+
+    if json {
+        let out = KeygenOutput {
+            secret_key: secret.clone(),
+            public_key: pubkey.clone(),
+            key_id: key_id.clone(),
+        };
+        println!("{}", serde_json::to_string(&out)?);
+    }
 
     let wrote_to_file = output.is_some();
 
-    // Output secret key
     match output {
         Some(path) => {
             fs::write(&path, format!("{}\n", secret))
                 .with_context(|| format!("Failed to write secret key to {:?}", path))?;
-            eprintln!("Secret key written to {:?}", path);
+            if !json {
+                eprintln!("secret_key: {:?}", path);
+            }
         }
-        None => {
+        None if !json => {
             println!("{}", secret);
         }
+        None => {}
     }
 
-    // Output public key
     match public {
         Some(path) => {
             fs::write(&path, format!("{}\n", pubkey))
                 .with_context(|| format!("Failed to write public key to {:?}", path))?;
-            eprintln!("Public key written to {:?}", path);
+            if !json {
+                eprintln!("public_key: {:?}", path);
+            }
         }
-        None if wrote_to_file => {
-            // If secret key went to file but no public key file specified, print it
-            eprintln!("Public key: {}", pubkey);
+        None if wrote_to_file && !json => {
+            eprintln!("public_key: {}", pubkey);
         }
-        None => {
-            // Both to stdout, print on separate line
-            eprintln!("Public key: {}", pubkey);
+        None if !json => {
+            eprintln!("public_key: {}", pubkey);
         }
+        None => {}
     }
 
-    eprintln!("Key ID: {}", keypair.public_key_id());
+    if !json {
+        eprintln!("key_id: {}", key_id);
+    }
     Ok(())
 }
 
-fn cmd_hash(file: PathBuf) -> Result<()> {
+fn cmd_hash(json: bool, file: PathBuf) -> Result<()> {
     let content = if file.to_string_lossy() == "-" {
         let mut buf = Vec::new();
         io::stdin().read_to_end(&mut buf)?;
@@ -225,11 +284,18 @@ fn cmd_hash(file: PathBuf) -> Result<()> {
     };
 
     let hash = Sha256::digest(&content);
-    println!("sha256:{}", hex::encode(hash));
+    let hash_str = format!("sha256:{}", hex::encode(hash));
+
+    if json {
+        println!("{}", serde_json::to_string(&HashOutput { hash: hash_str })?);
+    } else {
+        println!("{}", hash_str);
+    }
     Ok(())
 }
 
 fn cmd_attest(
+    _json: bool, // Attestation output is always JSON
     subject_hash: String,
     subject_name: String,
     subject_type: String,
@@ -243,32 +309,28 @@ fn cmd_attest(
     evidence_notes: Option<String>,
     output: Option<PathBuf>,
 ) -> Result<()> {
-    // Load secret key
-    let key_content = fs::read_to_string(&key)
-        .with_context(|| format!("Failed to read key file {:?}", key))?;
-    let keypair = KeyPair::from_base64(key_content.trim())
-        .map_err(|e| anyhow!("Invalid key: {}", e))?;
+    let key_content =
+        fs::read_to_string(&key).with_context(|| format!("Failed to read key file {:?}", key))?;
+    let keypair =
+        KeyPair::from_base64(key_content.trim()).map_err(|e| anyhow!("Invalid key: {}", e))?;
 
-    // Parse subject type
     let subj_type = match subject_type.to_lowercase().as_str() {
         "skill" => SubjectType::Skill,
         "agent" => SubjectType::Agent,
         "artifact" => SubjectType::Artifact,
         "data" => SubjectType::Data,
-        _ => return Err(anyhow!("Unknown subject type: {}", subject_type)),
+        _ => return Err(anyhow!("subject_type: skill|agent|artifact|data")),
     };
 
-    // Parse attestation type
     let att_type = match attestation_type.to_lowercase().as_str() {
         "security_audit" | "securityaudit" | "audit" => AttestationType::SecurityAudit,
         "code_review" | "codereview" | "review" => AttestationType::CodeReview,
         "functional_test" | "functionaltest" | "test" => AttestationType::FunctionalTest,
         "vouch" => AttestationType::Vouch,
         "revoke" => AttestationType::Revoke,
-        _ => return Err(anyhow!("Unknown attestation type: {}", attestation_type)),
+        _ => return Err(anyhow!("attestation_type: audit|review|test|vouch|revoke")),
     };
 
-    // Build subject
     let subject = Subject {
         subject_type: subj_type,
         name: subject_name,
@@ -277,31 +339,23 @@ fn cmd_attest(
         content_hash: subject_hash,
     };
 
-    // Build attestor
     let attestor = Attestor {
         agent_id,
         agent_name,
         platform,
     };
 
-    // Build attestation
     let mut attestation = Attestation::new(attestor, att_type, subject);
 
-    // Add claims
     for claim_str in claims {
         let parts: Vec<&str> = claim_str.splitn(2, '=').collect();
         if parts.len() != 2 {
-            return Err(anyhow!("Invalid claim format: {}. Use key=true or key=false", claim_str));
+            return Err(anyhow!("claim format: key=true|false"));
         }
-        let value = match parts[1].to_lowercase().as_str() {
-            "true" | "1" | "yes" => true,
-            "false" | "0" | "no" => false,
-            _ => return Err(anyhow!("Invalid claim value: {}. Use true or false", parts[1])),
-        };
+        let value = matches!(parts[1].to_lowercase().as_str(), "true" | "1" | "yes");
         attestation = attestation.with_claim(parts[0], value);
     }
 
-    // Add evidence
     if let Some(method) = evidence_method {
         let mut evidence = Evidence::new(method);
         if let Some(notes) = evidence_notes {
@@ -310,39 +364,50 @@ fn cmd_attest(
         attestation = attestation.with_evidence(evidence);
     }
 
-    // Sign
-    attestation.sign(&keypair).map_err(|e| anyhow!("Signing failed: {}", e))?;
+    attestation
+        .sign(&keypair)
+        .map_err(|e| anyhow!("Signing failed: {}", e))?;
 
-    // Output
-    let json = serde_json::to_string_pretty(&attestation)?;
+    let out = serde_json::to_string_pretty(&attestation)?;
     match output {
         Some(path) => {
-            fs::write(&path, format!("{}\n", json))
+            fs::write(&path, format!("{}\n", out))
                 .with_context(|| format!("Failed to write attestation to {:?}", path))?;
-            eprintln!("Attestation written to {:?}", path);
+            eprintln!("wrote: {:?}", path);
         }
         None => {
-            println!("{}", json);
+            println!("{}", out);
         }
     }
 
     Ok(())
 }
 
-fn cmd_verify(file: PathBuf, public_key: Option<PathBuf>) -> Result<()> {
-    // Load attestation
-    let content = fs::read_to_string(&file)
-        .with_context(|| format!("Failed to read {:?}", file))?;
-    let attestation: Attestation = serde_json::from_str(&content)
-        .with_context(|| "Failed to parse attestation JSON")?;
+fn cmd_verify(json: bool, file: PathBuf, public_key: Option<PathBuf>) -> Result<()> {
+    let content =
+        fs::read_to_string(&file).with_context(|| format!("Failed to read {:?}", file))?;
+    let attestation: Attestation =
+        serde_json::from_str(&content).with_context(|| "Failed to parse attestation JSON")?;
 
-    // Check if signed
     if !attestation.is_signed() {
-        eprintln!("WARNING: Attestation is not signed");
+        if json {
+            println!(
+                "{}",
+                serde_json::to_string(&VerifyOutput {
+                    valid: false,
+                    attestation_id: attestation.attestation_id.to_string(),
+                    attestation_type: format!("{:?}", attestation.attestation_type),
+                    attestor: attestation.attestor.agent_name.clone(),
+                    subject: attestation.subject.name.clone(),
+                    error: Some("not signed".to_string()),
+                })?
+            );
+        } else {
+            eprintln!("WARN: not signed");
+        }
         return Ok(());
     }
 
-    // If public key provided, verify signature
     if let Some(key_path) = public_key {
         let key_content = fs::read_to_string(&key_path)
             .with_context(|| format!("Failed to read public key {:?}", key_path))?;
@@ -351,90 +416,175 @@ fn cmd_verify(file: PathBuf, public_key: Option<PathBuf>) -> Result<()> {
 
         match attestation.verify(&pubkey) {
             Ok(()) => {
-                eprintln!("Signature VALID");
-                println!("Attestation ID: {}", attestation.attestation_id);
-                println!("Type: {:?}", attestation.attestation_type);
-                println!("Attestor: {} ({})", attestation.attestor.agent_name, attestation.attestor.agent_id);
-                println!("Subject: {} ({})", attestation.subject.name, attestation.subject.content_hash);
-                println!("Timestamp: {}", attestation.timestamp);
-                if !attestation.claims.is_empty() {
-                    println!("Claims:");
-                    for (k, v) in &attestation.claims {
-                        println!("  {}: {}", k, v);
-                    }
+                if json {
+                    println!(
+                        "{}",
+                        serde_json::to_string(&VerifyOutput {
+                            valid: true,
+                            attestation_id: attestation.attestation_id.to_string(),
+                            attestation_type: format!("{:?}", attestation.attestation_type),
+                            attestor: attestation.attestor.agent_name.clone(),
+                            subject: attestation.subject.name.clone(),
+                            error: None,
+                        })?
+                    );
+                } else {
+                    println!("VALID");
+                    println!("id: {}", attestation.attestation_id);
+                    println!("type: {:?}", attestation.attestation_type);
+                    println!("attestor: {}", attestation.attestor.agent_name);
+                    println!("subject: {}", attestation.subject.name);
                 }
             }
             Err(e) => {
-                eprintln!("Signature INVALID: {}", e);
+                if json {
+                    println!(
+                        "{}",
+                        serde_json::to_string(&VerifyOutput {
+                            valid: false,
+                            attestation_id: attestation.attestation_id.to_string(),
+                            attestation_type: format!("{:?}", attestation.attestation_type),
+                            attestor: attestation.attestor.agent_name.clone(),
+                            subject: attestation.subject.name.clone(),
+                            error: Some(e.to_string()),
+                        })?
+                    );
+                } else {
+                    eprintln!("INVALID: {}", e);
+                }
                 std::process::exit(1);
             }
         }
+    } else if json {
+        println!(
+            "{}",
+            serde_json::to_string(&VerifyOutput {
+                valid: true, // signed but unverified
+                attestation_id: attestation.attestation_id.to_string(),
+                attestation_type: format!("{:?}", attestation.attestation_type),
+                attestor: attestation.attestor.agent_name.clone(),
+                subject: attestation.subject.name.clone(),
+                error: None,
+            })?
+        );
     } else {
-        eprintln!("Attestation is signed (no public key provided to verify)");
-        println!("Attestation ID: {}", attestation.attestation_id);
-        println!("Type: {:?}", attestation.attestation_type);
-        println!("Attestor: {} ({})", attestation.attestor.agent_name, attestation.attestor.agent_id);
-        println!("Subject: {} ({})", attestation.subject.name, attestation.subject.content_hash);
+        println!("signed (no key to verify)");
+        println!("id: {}", attestation.attestation_id);
     }
 
     Ok(())
 }
 
 fn cmd_trust(
+    json: bool,
     hash: String,
     store_path: PathBuf,
     anchors: Vec<String>,
     min: usize,
     require_audit: bool,
 ) -> Result<()> {
-    // Load attestation store
     let content = fs::read_to_string(&store_path)
         .with_context(|| format!("Failed to read store {:?}", store_path))?;
-    let attestations: Vec<Attestation> = serde_json::from_str(&content)
-        .with_context(|| "Failed to parse attestation store JSON")?;
+    let attestations: Vec<Attestation> =
+        serde_json::from_str(&content).with_context(|| "Failed to parse attestation store")?;
 
     let mut store = MemoryStore::new();
     for att in attestations {
         store.add(att);
     }
 
-    // Build validator
     let mut config = ChainConfig::default().min_attestations(min);
     if require_audit {
         config = config.require_security_audit();
     }
 
     let mut validator = ChainValidator::new(&store).with_config(config);
-
-    // Add trust anchors
     for anchor_id in &anchors {
-        validator = validator.add_anchor(TrustAnchor::new(anchor_id, anchor_id, "CLI specified"));
+        validator = validator.add_anchor(TrustAnchor::new(anchor_id, anchor_id, "cli"));
     }
 
-    // Validate
     let result = validator.validate(&hash);
 
-    if result.trusted {
-        eprintln!("TRUSTED");
-        println!("Attestations: {}", result.attestation_count);
-        println!("Chain depth: {}", result.chain_depth);
-        for att in &result.attestations {
-            println!("  - {} by {} ({:?})", att.subject.name, att.attestor.agent_name, att.attestation_type);
-        }
+    if json {
+        println!(
+            "{}",
+            serde_json::to_string(&TrustOutput {
+                trusted: result.trusted,
+                attestation_count: result.attestation_count,
+                chain_depth: result.chain_depth,
+                warnings: result.warnings.clone(),
+            })?
+        );
+    } else if result.trusted {
+        println!("TRUSTED");
+        println!("attestations: {}", result.attestation_count);
+        println!("chain_depth: {}", result.chain_depth);
     } else {
-        eprintln!("NOT TRUSTED");
-        for warning in &result.warnings {
-            eprintln!("  - {}", warning);
+        eprintln!("NOT_TRUSTED");
+        for w in &result.warnings {
+            eprintln!("  {}", w);
         }
+    }
+
+    if !result.trusted {
         std::process::exit(1);
+    }
+    Ok(())
+}
+
+fn cmd_reputation(
+    json: bool,
+    hash: String,
+    store_path: PathBuf,
+    anchors: Vec<String>,
+) -> Result<()> {
+    let content = fs::read_to_string(&store_path)
+        .with_context(|| format!("Failed to read store {:?}", store_path))?;
+    let attestations: Vec<Attestation> =
+        serde_json::from_str(&content).with_context(|| "Failed to parse attestation store")?;
+
+    let mut store = MemoryStore::new();
+    for att in attestations {
+        store.add(att);
+    }
+
+    let mut calc = ReputationCalculator::new(&store);
+    for anchor_id in &anchors {
+        calc = calc.add_anchor(TrustAnchor::new(anchor_id, anchor_id, "cli"));
+    }
+
+    let result = calc.compute(&hash);
+
+    if json {
+        println!(
+            "{}",
+            serde_json::to_string(&ReputationOutput {
+                score: result.score,
+                attestation_count: result.attestation_count,
+                avg_age_days: result.avg_age_days,
+                warnings: result.warnings.clone(),
+            })?
+        );
+    } else {
+        println!("score: {:.2}", result.score);
+        println!("attestations: {}", result.attestation_count);
+        println!("avg_age_days: {:.1}", result.avg_age_days);
+        if !result.warnings.is_empty() {
+            for w in &result.warnings {
+                eprintln!("WARN: {}", w);
+            }
+        }
     }
 
     Ok(())
 }
 
-/// Hex encoding utility
 mod hex {
     pub fn encode(bytes: impl AsRef<[u8]>) -> String {
-        bytes.as_ref().iter().map(|b| format!("{:02x}", b)).collect()
+        bytes
+            .as_ref()
+            .iter()
+            .map(|b| format!("{:02x}", b))
+            .collect()
     }
 }
