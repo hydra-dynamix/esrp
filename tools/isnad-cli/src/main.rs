@@ -5,8 +5,9 @@
 use anyhow::{anyhow, Context, Result};
 use clap::{Parser, Subcommand};
 use isnad::{
-    Attestation, AttestationType, Attestor, ChainConfig, ChainValidator, Evidence, KeyPair,
-    MemoryStore, PublicKey, ReputationCalculator, Subject, SubjectType, TrustAnchor,
+    Attestation, AttestationType, Attestor, CaptchaChallenge, CaptchaConfig, CaptchaResponse,
+    CaptchaVerifier, ChainConfig, ChainValidator, Evidence, KeyPair, MemoryStore, PublicKey,
+    ReputationCalculator, Subject, SubjectType, TaskAnswer, TrustAnchor,
 };
 use serde::Serialize;
 use sha2::{Digest, Sha256};
@@ -128,6 +129,42 @@ enum Commands {
         #[arg(long, short = 'a')]
         anchor: Vec<String>,
     },
+
+    /// AI CAPTCHA - prove you're an agent
+    #[command(visible_alias = "cap")]
+    Captcha {
+        #[command(subcommand)]
+        action: CaptchaAction,
+    },
+}
+
+#[derive(Subcommand)]
+enum CaptchaAction {
+    /// Generate a challenge (save expected answers separately)
+    Generate {
+        /// Output challenge file
+        #[arg(short, long)]
+        output: Option<PathBuf>,
+        /// Output expected answers file (keep secret!)
+        #[arg(long)]
+        answers: Option<PathBuf>,
+        /// Time limit in milliseconds
+        #[arg(long, default_value = "5000")]
+        time_limit: u64,
+    },
+
+    /// Verify a response against challenge + answers
+    Verify {
+        /// Challenge JSON file
+        #[arg(long, short = 'c')]
+        challenge: PathBuf,
+        /// Response JSON file
+        #[arg(long, short = 'r')]
+        response: PathBuf,
+        /// Expected answers JSON file
+        #[arg(long, short = 'a')]
+        answers: PathBuf,
+    },
 }
 
 // JSON output types
@@ -217,6 +254,18 @@ fn main() -> Result<()> {
             store,
             anchor,
         } => cmd_reputation(cli.json, hash, store, anchor),
+        Commands::Captcha { action } => match action {
+            CaptchaAction::Generate {
+                output,
+                answers,
+                time_limit,
+            } => cmd_captcha_generate(cli.json, output, answers, time_limit),
+            CaptchaAction::Verify {
+                challenge,
+                response,
+                answers,
+            } => cmd_captcha_verify(cli.json, challenge, response, answers),
+        },
     }
 }
 
@@ -577,6 +626,108 @@ fn cmd_reputation(
     }
 
     Ok(())
+}
+
+fn cmd_captcha_generate(
+    _json: bool, // Always JSON output for captcha
+    output: Option<PathBuf>,
+    answers_path: Option<PathBuf>,
+    time_limit: u64,
+) -> Result<()> {
+    let config = CaptchaConfig {
+        time_limit_ms: time_limit,
+        ..Default::default()
+    };
+    let verifier = CaptchaVerifier::with_config(config);
+    let (challenge, expected_answers) = verifier.generate_challenge();
+
+    // Output challenge
+    let challenge_json = serde_json::to_string_pretty(&challenge)?;
+    match output {
+        Some(path) => {
+            fs::write(&path, format!("{}\n", challenge_json))
+                .with_context(|| format!("Failed to write challenge to {:?}", path))?;
+            eprintln!("challenge: {:?}", path);
+        }
+        None => {
+            println!("{}", challenge_json);
+        }
+    }
+
+    // Output expected answers (keep secret!)
+    match answers_path {
+        Some(path) => {
+            let answers_json = serde_json::to_string_pretty(&expected_answers)?;
+            fs::write(&path, format!("{}\n", answers_json))
+                .with_context(|| format!("Failed to write answers to {:?}", path))?;
+            eprintln!("answers: {:?} (keep secret!)", path);
+        }
+        None => {
+            eprintln!("WARN: answers not saved. Use --answers to save for verification.");
+        }
+    }
+
+    eprintln!("time_limit_ms: {}", time_limit);
+    eprintln!("challenge_id: {}", challenge.challenge_id);
+
+    Ok(())
+}
+
+fn cmd_captcha_verify(
+    json: bool,
+    challenge_path: PathBuf,
+    response_path: PathBuf,
+    answers_path: PathBuf,
+) -> Result<()> {
+    // Load challenge
+    let challenge_content = fs::read_to_string(&challenge_path)
+        .with_context(|| format!("Failed to read challenge {:?}", challenge_path))?;
+    let challenge: CaptchaChallenge = serde_json::from_str(&challenge_content)
+        .with_context(|| "Failed to parse challenge JSON")?;
+
+    // Load response
+    let response_content = fs::read_to_string(&response_path)
+        .with_context(|| format!("Failed to read response {:?}", response_path))?;
+    let response: CaptchaResponse = serde_json::from_str(&response_content)
+        .with_context(|| "Failed to parse response JSON")?;
+
+    // Load expected answers
+    let answers_content = fs::read_to_string(&answers_path)
+        .with_context(|| format!("Failed to read answers {:?}", answers_path))?;
+    let expected: Vec<TaskAnswer> = serde_json::from_str(&answers_content)
+        .with_context(|| "Failed to parse answers JSON")?;
+
+    // Verify
+    let verifier = CaptchaVerifier::new();
+    match verifier.verify(&challenge, &response, &expected) {
+        Ok(verification) => {
+            if json {
+                println!("{}", serde_json::to_string(&verification)?);
+            } else {
+                println!("VERIFIED");
+                println!("elapsed_ms: {}", verification.elapsed_ms);
+                println!(
+                    "tasks: {}/{}",
+                    verification.tasks_correct, verification.tasks_total
+                );
+            }
+            Ok(())
+        }
+        Err(e) => {
+            if json {
+                println!(
+                    "{}",
+                    serde_json::to_string(&serde_json::json!({
+                        "verified": false,
+                        "error": e.to_string()
+                    }))?
+                );
+            } else {
+                eprintln!("FAILED: {}", e);
+            }
+            std::process::exit(1);
+        }
+    }
 }
 
 mod hex {

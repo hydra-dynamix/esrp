@@ -41,12 +41,14 @@
 //! assert!(attestation.verify(&keypair.public_key()).is_ok());
 //! ```
 
+mod captcha;
 mod chain;
 mod error;
 mod reputation;
 mod signing;
 mod types;
 
+pub use captcha::*;
 pub use chain::*;
 pub use error::*;
 pub use reputation::*;

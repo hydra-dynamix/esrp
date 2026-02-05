@@ -27,6 +27,9 @@ pub enum IsnadError {
 
     #[error("Serialization error: {0}")]
     SerializationError(#[from] serde_json::Error),
+
+    #[error("AI CAPTCHA verification failed: {0}")]
+    CaptchaFailed(String),
 }
 
 // Keep the old name as an alias for backwards compatibility
