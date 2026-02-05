@@ -7,6 +7,7 @@ members = [
     "crates/esrp-http",
     "crates/isnad",
     "tools/esrp-cli",
+    "tools/isnad-cli",
     "tools/generate-fixtures",
     "bindings/python",
     "examples/esrp-server",

@@ -1,0 +1,19 @@
+[package]
+name = "isnad-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Command-line tool for Isnad agent trust attestations"
+
+[[bin]]
+name = "isnad"
+path = "src/main.rs"
+
+[dependencies]
+isnad = { path = "../../crates/isnad" }
+clap = { version = "4.0", features = ["derive"] }
+serde_json = { workspace = true }
+anyhow = "1.0"
+sha2 = "0.10"
+base64 = "0.22"
