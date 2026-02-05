@@ -43,10 +43,12 @@
 
 mod chain;
 mod error;
+mod reputation;
 mod signing;
 mod types;
 
 pub use chain::*;
 pub use error::*;
+pub use reputation::*;
 pub use signing::*;
 pub use types::*;
