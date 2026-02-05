@@ -1,6 +1,31 @@
-[package]
-name = "esrp"
-version = "0.1.0"
-edition = "2024"
+[workspace]
+resolver = "2"
+members = [
+    "crates/esrp-core",
+    "crates/esrp-canonical",
+    "crates/esrp-workspace",
+    "crates/esrp-http",
+    "tools/esrp-cli",
+    "tools/generate-fixtures",
+    "bindings/python",
+    "examples/esrp-server",
+]
 
-[dependencies]
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/hydra-dynamix/esrp"
+
+[workspace.dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+uuid = { version = "1.10", features = ["serde", "v4"] }
+chrono = { version = "0.4", features = ["serde"] }
+thiserror = "1.0"
+sha2 = "0.10"
+tokio = { version = "1.0", features = ["full"] }
+axum = "0.7"
+reqwest = { version = "0.12", features = ["json"] }
+tower-http = { version = "0.5", features = ["cors"] }
+async-trait = "0.1"

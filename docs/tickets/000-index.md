@@ -45,41 +45,41 @@ Phase 1 (Core Types)
 ## All Tickets
 
 ### Phase 0: Repository Setup
-- [ ] [001 - Create Cargo Workspace](001-create-cargo-workspace.md)
+- [x] [001 - Create Cargo Workspace](001-create-cargo-workspace.md)
 - [ ] [002 - Initialize Git Repository](002-initialize-git-repository.md)
 
 ### Phase 1: Core Protocol Types
-- [ ] [101 - Create esrp-core Crate](101-create-esrp-core-crate.md)
-- [ ] [102 - Implement Core Types](102-implement-core-types.md)
-- [ ] [103 - Implement Version Validation](103-implement-version-validation.md)
-- [ ] [104 - Implement Input Validation](104-implement-input-validation.md)
-- [ ] [105 - Write Core Unit Tests](105-write-core-unit-tests.md)
+- [x] [101 - Create esrp-core Crate](101-create-esrp-core-crate.md)
+- [x] [102 - Implement Core Types](102-implement-core-types.md)
+- [x] [103 - Implement Version Validation](103-implement-version-validation.md)
+- [x] [104 - Implement Input Validation](104-implement-input-validation.md)
+- [x] [105 - Write Core Unit Tests](105-write-core-unit-tests.md)
 
 ### Phase 2: Canonical Representation
-- [ ] [201 - Create esrp-canonical Crate](201-create-esrp-canonical-crate.md)
-- [ ] [202 - Implement Canonical JSON Serialization](202-implement-canonical-json.md)
-- [ ] [203 - Implement SHA256 Hashing](203-implement-hashing.md)
-- [ ] [204 - Implement Payload Hash Derivation](204-implement-payload-hash.md)
-- [ ] [205 - Document Number Handling](205-document-number-handling.md)
-- [ ] [206 - Write Canonical Tests](206-write-canonical-tests.md)
+- [x] [201 - Create esrp-canonical Crate](201-create-esrp-canonical-crate.md)
+- [x] [202 - Implement Canonical JSON Serialization](202-implement-canonical-json.md)
+- [x] [203 - Implement SHA256 Hashing](203-implement-hashing.md)
+- [x] [204 - Implement Payload Hash Derivation](204-implement-payload-hash.md)
+- [x] [205 - Document Number Handling](205-document-number-handling.md)
+- [x] [206 - Write Canonical Tests](206-write-canonical-tests.md)
 
 ### Phase 3: Workspace Semantics
-- [ ] [301 - Create esrp-workspace Crate](301-create-esrp-workspace-crate.md)
-- [ ] [302 - Implement URI Parser](302-implement-uri-parser.md)
-- [ ] [303 - Define WorkspaceProvider Trait](303-define-workspace-provider-trait.md)
-- [ ] [304 - Implement FilesystemWorkspace](304-implement-filesystem-workspace.md)
-- [ ] [305 - Write Workspace Tests](305-write-workspace-tests.md)
+- [x] [301 - Create esrp-workspace Crate](301-create-esrp-workspace-crate.md)
+- [x] [302 - Implement URI Parser](302-implement-uri-parser.md)
+- [x] [303 - Define WorkspaceProvider Trait](303-define-workspace-provider-trait.md)
+- [x] [304 - Implement FilesystemWorkspace](304-implement-filesystem-workspace.md)
+- [x] [305 - Write Workspace Tests](305-write-workspace-tests.md)
 
 ### Phase 4: Test Fixtures
-- [ ] [401 - Create Fixture Directory Structure](401-create-fixture-structure.md)
-- [ ] [402 - Create Request Fixtures](402-create-request-fixtures.md)
-- [ ] [403 - Generate Canonical Fixtures](403-generate-canonical-fixtures.md)
-- [ ] [404 - Create Response Fixtures](404-create-response-fixtures.md)
-- [ ] [405 - Document Fixture Format](405-document-fixture-format.md)
+- [x] [401 - Create Fixture Directory Structure](401-create-fixture-structure.md)
+- [x] [402 - Create Request Fixtures](402-create-request-fixtures.md)
+- [x] [403 - Generate Canonical Fixtures](403-generate-canonical-fixtures.md)
+- [x] [404 - Create Response Fixtures](404-create-response-fixtures.md)
+- [x] [405 - Document Fixture Format](405-document-fixture-format.md)
 
 ### Phase 5: Conformance Tests
-- [ ] [501 - Create Conformance Test Suite](501-create-conformance-test-suite.md)
-- [ ] [502 - Add CI Pipeline](502-add-ci-pipeline.md)
+- [x] [501 - Create Conformance Test Suite](501-create-conformance-test-suite.md)
+- [x] [502 - Add CI Pipeline](502-add-ci-pipeline.md)
 
 ### Phase 6: HTTP Transport
 - [ ] [601 - Create esrp-http Crate](601-create-esrp-http-crate.md)

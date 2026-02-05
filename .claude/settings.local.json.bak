@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(where:*)",
+      "Bash(cmd:*)",
+      "Bash(powershell:*)",
+      "Bash(git:*)",
+      "Bash(dev:*)",
+      "Bash(cargo:*)",
+      "Bash(gh:*)",
+      "WebSearch"
+    ]
+  }
+}

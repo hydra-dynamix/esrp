@@ -1,0 +1,14 @@
+{
+  "esrp_version": "1.0",
+  "request_id": "550e8400-e29b-41d4-a716-446655440003",
+  "status": "accepted",
+  "timing": {
+    "accepted_at": "2025-01-01T00:00:00Z"
+  },
+  "outputs": [],
+  "artifacts": [],
+  "job": {
+    "job_id": "aa0e8400-e29b-41d4-a716-446655440000",
+    "state": "queued"
+  }
+}

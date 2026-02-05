@@ -57,7 +57,7 @@ commands = [
 # Security, license, and dep hygiene. Safe for CI, no file writes.
 commands = [
   ["cargo", "audit"],
-  ["cargo", "check"],
+  ["cargo", "deny", "check"],
   ["cargo", "+nightly", "udeps"]
 ]
 

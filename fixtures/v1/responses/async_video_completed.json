@@ -1,0 +1,38 @@
+{
+  "esrp_version": "1.0",
+  "request_id": "550e8400-e29b-41d4-a716-446655440003",
+  "status": "succeeded",
+  "timing": {
+    "accepted_at": "2025-01-01T00:00:00Z",
+    "started_at": "2025-01-01T00:00:10Z",
+    "finished_at": "2025-01-01T00:05:00Z",
+    "duration_ms": 290000
+  },
+  "outputs": [
+    {
+      "name": "video",
+      "content_type": "video/mp4",
+      "data": "workspace://artifacts/video_aa0e8400.mp4",
+      "encoding": "path",
+      "metadata": {
+        "duration_seconds": 10,
+        "resolution": "1920x1080",
+        "fps": 30
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "bb0e8400-e29b-41d4-a716-446655440000",
+      "kind": "file",
+      "uri": "workspace://artifacts/video_aa0e8400.mp4",
+      "sha256": "fedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321",
+      "size_bytes": 52428800,
+      "retention": "pinned"
+    }
+  ],
+  "job": {
+    "job_id": "aa0e8400-e29b-41d4-a716-446655440000",
+    "state": "succeeded"
+  }
+}

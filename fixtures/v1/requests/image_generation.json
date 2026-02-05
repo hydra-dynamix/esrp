@@ -1,0 +1,47 @@
+{
+  "esrp_version": "1.0",
+  "request_id": "550e8400-e29b-41d4-a716-446655440002",
+  "idempotency_key": "user-request-12345",
+  "timestamp": "2025-01-01T00:00:00Z",
+  "scope_id": "660e8400-e29b-41d4-a716-446655440000",
+  "causation_id": "550e8400-e29b-41d4-a716-446655440001",
+  "caller": {
+    "system": "erasmus",
+    "agent_id": "art-agent",
+    "run_id": "run-abc123"
+  },
+  "target": {
+    "service": "art",
+    "operation": "generate",
+    "variant": "fast"
+  },
+  "mode": {
+    "type": "sync",
+    "timeout_ms": 120000
+  },
+  "context": {
+    "trace_id": "770e8400-e29b-41d4-a716-446655440000",
+    "span_id": "880e8400-e29b-41d4-a716-446655440000",
+    "parent_span_id": "880e8400-e29b-41d4-a716-446655440001",
+    "tags": {
+      "env": "production",
+      "user_id": "user-123"
+    }
+  },
+  "inputs": [
+    {
+      "name": "prompt",
+      "content_type": "text/plain",
+      "data": "A serene mountain landscape at sunset",
+      "encoding": "utf-8",
+      "metadata": {}
+    }
+  ],
+  "params": {
+    "width": 1024,
+    "height": 768,
+    "style": "photorealistic",
+    "seed": "42"
+  },
+  "params_schema_ref": "https://example.com/schemas/art-generate.json"
+}

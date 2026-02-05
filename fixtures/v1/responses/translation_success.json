@@ -1,0 +1,27 @@
+{
+  "esrp_version": "1.0",
+  "request_id": "550e8400-e29b-41d4-a716-446655440001",
+  "status": "succeeded",
+  "timing": {
+    "started_at": "2025-01-01T00:00:00Z",
+    "finished_at": "2025-01-01T00:00:00.500Z",
+    "duration_ms": 500
+  },
+  "outputs": [
+    {
+      "name": "translation_1",
+      "content_type": "text/plain",
+      "data": "Hola",
+      "encoding": "utf-8",
+      "metadata": {"index": 0}
+    },
+    {
+      "name": "translation_2",
+      "content_type": "text/plain",
+      "data": "Mundo",
+      "encoding": "utf-8",
+      "metadata": {"index": 1}
+    }
+  ],
+  "artifacts": []
+}

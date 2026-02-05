@@ -1,0 +1,24 @@
+{
+  "esrp_version": "1.0",
+  "request_id": "550e8400-e29b-41d4-a716-446655440000",
+  "timestamp": "2025-01-01T00:00:00Z",
+  "caller": {
+    "system": "erasmus"
+  },
+  "target": {
+    "service": "tts",
+    "operation": "synthesize"
+  },
+  "inputs": [
+    {
+      "name": "text",
+      "content_type": "text/plain",
+      "data": "Hello, world!",
+      "encoding": "utf-8",
+      "metadata": {}
+    }
+  ],
+  "params": {
+    "voice": "en-US-Standard-A"
+  }
+}

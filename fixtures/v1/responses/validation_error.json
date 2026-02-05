@@ -1,0 +1,21 @@
+{
+  "esrp_version": "1.0",
+  "request_id": "550e8400-e29b-41d4-a716-446655440005",
+  "status": "failed",
+  "timing": {
+    "started_at": "2025-01-01T00:00:00Z",
+    "finished_at": "2025-01-01T00:00:00.010Z",
+    "duration_ms": 10
+  },
+  "outputs": [],
+  "artifacts": [],
+  "error": {
+    "code": "INVALID_INPUT_SCHEMA",
+    "message": "Missing required field 'inputs'",
+    "retryable": false,
+    "details": {
+      "field": "inputs",
+      "reason": "required field missing"
+    }
+  }
+}

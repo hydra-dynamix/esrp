@@ -1,0 +1,37 @@
+{
+  "esrp_version": "1.0",
+  "request_id": "550e8400-e29b-41d4-a716-446655440001",
+  "timestamp": "2025-01-01T00:00:00Z",
+  "caller": {
+    "system": "erasmus",
+    "agent_id": "translator-agent"
+  },
+  "target": {
+    "service": "translator",
+    "operation": "translate"
+  },
+  "mode": {
+    "type": "sync",
+    "timeout_ms": 30000
+  },
+  "inputs": [
+    {
+      "name": "text_1",
+      "content_type": "text/plain",
+      "data": "Hello",
+      "encoding": "utf-8",
+      "metadata": {"index": 0}
+    },
+    {
+      "name": "text_2",
+      "content_type": "text/plain",
+      "data": "World",
+      "encoding": "utf-8",
+      "metadata": {"index": 1}
+    }
+  ],
+  "params": {
+    "source_lang": "en",
+    "target_lang": "es"
+  }
+}
