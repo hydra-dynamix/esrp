@@ -5,6 +5,7 @@ members = [
     "crates/esrp-canonical",
     "crates/esrp-workspace",
     "crates/esrp-http",
+    "crates/isnad",
     "tools/esrp-cli",
     "tools/generate-fixtures",
     "bindings/python",
