@@ -41,10 +41,12 @@
 //! assert!(attestation.verify(&keypair.public_key()).is_ok());
 //! ```
 
+mod chain;
 mod error;
 mod signing;
 mod types;
 
+pub use chain::*;
 pub use error::*;
 pub use signing::*;
 pub use types::*;
